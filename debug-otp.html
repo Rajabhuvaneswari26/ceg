@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Debug Test</title>
+</head>
+<body>
+    <h1>OTP Debug Test</h1>
+    <input type="email" id="email" placeholder="Enter email" value="test@example.com">
+    <button onclick="testOTP()">Test OTP</button>
+    <div id="result"></div>
+
+    <script>
+        async function testOTP() {
+            const email = document.getElementById('email').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('Testing OTP with email:', email);
+                
+                const response = await fetch('http://localhost:5000/api/auth/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email }),
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <h3 style="color: green;">✅ Success!</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Message: ${data.message}</p>
+                        <p>Expires in: ${data.expiresIn} seconds</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3 style="color: red;">❌ Error!</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Message: ${data.message}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <h3 style="color: red;">💥 Network Error!</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+
